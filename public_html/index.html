@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html ng-app="listaTarefasApp">
+    <head>
+        <title>Lista de Tarefas</title>
+        <meta charset="UTF-8">
+        <style>
+            .para-fazer { color: red; }
+            .concluida {  color: green; }
+        </style>
+    </head>
+    <body ng-controller="TarefasController">
+        <section>
+            <input type="text" ng-model="tarefa"/>
+            <button ng-click="adicionar()">Adicionar</button>
+        </section>
+        <section>
+            <ol>
+                <li ng-repeat="t in tarefas track by $index"
+                    ng-click="concluir($index)"
+                    ng-class="{
+                        'para-fazer': t.concluida === false,
+                        'concluida': t.concluida === true
+                    }">
+                    {{t.descricao}}
+                </li>
+            </ol>
+        </section>
+        <script src="js/angular.min.js"></script>
+        <script>
+            var app = angular.module('listaTarefasApp', []);
+            
+            app.controller('TarefasController', function($scope, TarefasService){
+                $scope.tarefa = '';
+                $scope.tarefas = TarefasService.listar();
+                
+                $scope.adicionar = function() {
+                    var objetoTarefa = {
+                        descricao: $scope.tarefa,
+                        concluida: false
+                    };
+                    TarefasService.adicionar(objetoTarefa);
+                    $scope.tarefa = '';
+                };
+                
+                $scope.concluir = function(indice) {
+                    TarefasService.concluir(indice);
+                };
+            });
+            
+            app.service('TarefasService', function() {
+                var tarefas = [];
+                
+                this.listar = function() {
+                    return tarefas;
+                };
+                
+                this.adicionar = function(objetoTarefa) {
+                    tarefas.push(objetoTarefa);
+                };
+                
+                this.concluir = function(indice) {
+                    tarefas[indice].concluida = !tarefas[indice].concluida;
+                };
+            });
+        </script>
+    </body>
+</html>
